@@ -18,7 +18,8 @@ class ChatListWidget extends StatelessWidget {
   final InferenceChat? chat;
   final List<Message> messages;
   final ValueChanged<Message> gemmaHandler;
-  final ValueChanged<String> humanHandler;
+  final ValueChanged<ChatMessageInputData> humanHandler;
+  // final ValueChanged<String> humanHandler;
   final ValueChanged<String> errorHandler;
 
   @override

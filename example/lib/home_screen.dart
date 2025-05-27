@@ -9,7 +9,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF0b2351),
       appBar: AppBar(
-        title: const Text('Flutter Gemma Example'),
+        title: const Text('Gemma3n Demo'),
         backgroundColor: const Color(0xFF0b2351),
       ),
       body: Padding(
@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
               color: Colors.white,
             ),
             const SizedBox(height: 32),
-            
+
             // Welcome text
             const Text(
               'Welcome to Flutter Gemma',
@@ -45,7 +45,7 @@ class HomeScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 48),
-            
+
             // Navigation card
             _buildNavigationCard(
               context,

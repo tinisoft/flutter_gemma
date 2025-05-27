@@ -3,6 +3,10 @@ package dev.flutterberlin.flutter_gemma
 import android.content.Context
 import com.google.mediapipe.tasks.genai.llminference.LlmInference
 import com.google.mediapipe.tasks.genai.llminference.LlmInferenceSession
+import com.google.mediapipe.tasks.genai.llminference.GraphOptions
+import android.graphics.BitmapFactory
+import com.google.mediapipe.framework.image.BitmapImageBuilder
+import com.google.mediapipe.framework.image.MPImage
 import java.io.File
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -63,6 +67,7 @@ class InferenceModel(
             val optionsBuilder = LlmInference.LlmInferenceOptions.builder()
                 .setModelPath(config.modelPath)
                 .setMaxTokens(config.maxTokens)
+                .setMaxNumImages(1)
                 .apply {
                     config.supportedLoraRanks?.let { setSupportedLoraRanks(it) }
                     config.preferredBackend?.let {
@@ -102,6 +107,7 @@ class InferenceModelSession(
             .setTemperature(config.temperature)
             .setRandomSeed(config.randomSeed)
             .setTopK(config.topK)
+            .setGraphOptions(GraphOptions.builder().setEnableVisionModality(true).build())
             .apply {
                 config.topP?.let { setTopP(it) }
                 config.loraPath?.let { setLoraPath(it) }
@@ -114,6 +120,35 @@ class InferenceModelSession(
     fun sizeInTokens(prompt: String): Int = session.sizeInTokens(prompt)
 
     fun addQueryChunk(prompt: String) = session.addQueryChunk(prompt)
+
+    fun addImgToCtx(imageByteArray: ByteArray) {
+        val bitmap = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.size)
+
+        if (bitmap == null) {
+            return
+        }
+
+        // 2. Convert the Bitmap to an MPImage object
+        val mpImage: MPImage = try {
+            BitmapImageBuilder(bitmap).build()
+        } catch (e: RuntimeException) {
+            if (!bitmap.isRecycled) {
+                bitmap.recycle()
+            }
+            return
+        }
+
+        // 3. Add the MPImage to the session
+        try {
+            session.addImage(mpImage)
+        } catch (e: Exception) {
+        }
+
+        if (!bitmap.isRecycled) {
+            bitmap.recycle()
+        }
+    }
+
 
     fun generateResponse(): String = session.generateResponse()
 

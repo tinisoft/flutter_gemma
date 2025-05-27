@@ -146,6 +146,11 @@ class WebModelSession extends InferenceModelSession {
   }
 
   @override
+  Future<void> addImgToCtx(Uint8List image) async {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<String> getResponse() async {
     final String fullPrompt = _queryChunks.join(" ");
     final response =

@@ -36,6 +36,7 @@ dependencies:
   web: ^1.1.1
   path_provider: ^2.1.5
   shared_preferences: ^2.5.2
+  image_picker: ^1.1.2
 
 dev_dependencies:
   integration_test:

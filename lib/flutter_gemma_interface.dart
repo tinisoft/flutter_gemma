@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_gemma/core/chat.dart';
 import 'package:flutter_gemma/core/message.dart';
 import 'package:flutter_gemma/core/model.dart';
@@ -103,6 +104,8 @@ abstract class InferenceModelSession {
   Future<int> sizeInTokens(String text);
 
   Future<void> addQueryChunk(Message message);
+
+  Future<void> addImgToCtx(Uint8List image);
 
   Future<void> close();
 }

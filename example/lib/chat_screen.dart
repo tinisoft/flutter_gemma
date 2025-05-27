@@ -79,7 +79,7 @@ class ChatScreenState extends State<ChatScreen> {
           },
         ),
         title: const Text(
-          'Flutter Gemma Example',
+          'Gemma3n Demo',
           style: TextStyle(fontSize: 20),
           softWrap: true,
           overflow: TextOverflow.ellipsis,
@@ -105,10 +105,13 @@ class ChatScreenState extends State<ChatScreen> {
                         _messages.add(message);
                       });
                     },
-                    humanHandler: (text) {
+                    humanHandler: (chatInput) {
                       setState(() {
                         _error = null;
-                        _messages.add(Message(text: text, isUser: true));
+                        _messages.add(Message(
+                            text: chatInput.text,
+                            isUser: true,
+                            imageFile: chatInput.imageFile));
                       });
                     },
                     errorHandler: (err) {

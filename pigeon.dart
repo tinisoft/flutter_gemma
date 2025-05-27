@@ -50,6 +50,9 @@ abstract class PlatformService {
   @async
   void addQueryChunk(String prompt);
 
+  @async 
+  void addImgToCtx(Uint8List image);
+
   @async
   String generateResponse();
 

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_gemma/core/message.dart';
 import 'package:flutter_gemma/flutter_gemma_interface.dart';
 
@@ -33,6 +35,10 @@ class InferenceChat {
     await session.addQueryChunk(message);
     _fullHistory.add(message);
     _modelHistory.add(message);
+  }
+
+  Future<void> addImgToCtx(Uint8List image) async {
+    await session.addImgToCtx(image);
   }
 
   Future<String> generateChatResponse() async {
@@ -73,7 +79,8 @@ class InferenceChat {
   }
 
   Future<void> _recreateSessionWithReducedChunks() async {
-    while (_currentTokens >= (maxTokens - tokenBuffer) && _modelHistory.isNotEmpty) {
+    while (_currentTokens >= (maxTokens - tokenBuffer) &&
+        _modelHistory.isNotEmpty) {
       final removedMessage = _modelHistory.removeAt(0);
       final size = await session.sizeInTokens(removedMessage.text);
       _currentTokens -= size;

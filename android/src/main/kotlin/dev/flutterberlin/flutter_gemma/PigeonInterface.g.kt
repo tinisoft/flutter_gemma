@@ -92,6 +92,7 @@ interface PlatformService {
   fun closeSession(callback: (Result<Unit>) -> Unit)
   fun sizeInTokens(prompt: String, callback: (Result<Long>) -> Unit)
   fun addQueryChunk(prompt: String, callback: (Result<Unit>) -> Unit)
+  fun addImgToCtx(image: ByteArray, callback: (Result<Unit>) -> Unit)
   fun generateResponse(callback: (Result<String>) -> Unit)
   fun generateResponseAsync(callback: (Result<Unit>) -> Unit)
 
@@ -210,6 +211,25 @@ interface PlatformService {
             val args = message as List<Any?>
             val promptArg = args[0] as String
             api.addQueryChunk(promptArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                reply.reply(wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_gemma.PlatformService.addImgToCtx$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val imageArg = args[0] as ByteArray
+            api.addImgToCtx(imageArg) { result: Result<Unit> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

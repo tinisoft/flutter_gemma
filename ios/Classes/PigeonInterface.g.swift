@@ -123,6 +123,7 @@ protocol PlatformService {
   func closeSession(completion: @escaping (Result<Void, Error>) -> Void)
   func sizeInTokens(prompt: String, completion: @escaping (Result<Int64, Error>) -> Void)
   func addQueryChunk(prompt: String, completion: @escaping (Result<Void, Error>) -> Void)
+  func addImgToCtx(image: FlutterStandardTypedData, completion: @escaping (Result<Void, Error>) -> Void)
   func generateResponse(completion: @escaping (Result<String, Error>) -> Void)
   func generateResponseAsync(completion: @escaping (Result<Void, Error>) -> Void)
 }
@@ -237,6 +238,23 @@ class PlatformServiceSetup {
       }
     } else {
       addQueryChunkChannel.setMessageHandler(nil)
+    }
+    let addImgToCtxChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_gemma.PlatformService.addImgToCtx\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      addImgToCtxChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let imageArg = args[0] as! FlutterStandardTypedData
+        api.addImgToCtx(image: imageArg) { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      addImgToCtxChannel.setMessageHandler(nil)
     }
     let generateResponseChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_gemma.PlatformService.generateResponse\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

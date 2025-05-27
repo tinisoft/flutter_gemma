@@ -131,6 +131,16 @@ private class PlatformServiceImpl(
       }
     }
   }
+  override fun addImgToCtx(image: ByteArray, callback: (Result<Unit>) -> Unit) {
+    scope.launch {
+      try {
+        session?.addImgToCtx(image) ?: throw IllegalStateException("Session not created")
+        callback(Result.success(Unit))
+      } catch (e: Exception) {
+        callback(Result.failure(e))
+      }
+    }
+  }
 
   override fun generateResponse(callback: (Result<String>) -> Unit) {
     scope.launch {

@@ -70,8 +70,6 @@ class MobileInferenceModel extends InferenceModel {
     }
   }
 
-
-
   @override
   Future<void> close() async {
     _isClosed = true;
@@ -113,6 +111,11 @@ class MobileInferenceModelSession extends InferenceModelSession {
   Future<void> addQueryChunk(Message message) async {
     final finalPrompt = message.transformToChatPrompt(type: modelType);
     await _platformService.addQueryChunk(finalPrompt);
+  }
+
+  @override
+  Future<void> addImgToCtx(Uint8List image) async {
+    await _platformService.addImgToCtx(image);
   }
 
   @override
