@@ -156,10 +156,8 @@ class InferenceModelSession(
 
    fun addAudioToCtx(audioByteArray: ByteArray) {
     try {
-            // MediaPipe requires mono WAV. Your recorder should already record in WAV/PCM16.
             session.addAudio(audioByteArray)
         } catch (e: Exception) {
-            // Optionally log or send errors to errorFlow
             errorFlow.tryEmit(e)
         }
     }
