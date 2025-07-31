@@ -41,6 +41,10 @@ class InferenceChat {
     await session.addImgToCtx(image);
   }
 
+  Future<void> addAudioToCtx(Uint8List audio) async {
+    return session.addAudioToCtx(audio);
+  }
+
   Future<String> generateChatResponse() async {
     final response = await session.getResponse();
     final responseTokens = await session.sizeInTokens(response);

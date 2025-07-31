@@ -102,20 +102,25 @@ class InferenceModelSession(
 ) {
     private val session: LlmInferenceSession
 
-    init {
-        val sessionOptionsBuilder = LlmInferenceSession.LlmInferenceSessionOptions.builder()
-            .setTemperature(config.temperature)
-            .setRandomSeed(config.randomSeed)
-            .setTopK(config.topK)
-            .setGraphOptions(GraphOptions.builder().setEnableVisionModality(true).build())
-            .apply {
-                config.topP?.let { setTopP(it) }
-                config.loraPath?.let { setLoraPath(it) }
-            }
+   init {
+    val sessionOptionsBuilder = LlmInferenceSession.LlmInferenceSessionOptions.builder()
+        .setTemperature(config.temperature)
+        .setRandomSeed(config.randomSeed)
+        .setTopK(config.topK)
+        .setGraphOptions(
+            GraphOptions.builder()
+                .setEnableVisionModality(true)
+                .setEnableAudioModality(true)  
+                .build()
+        )
+        .apply {
+            config.topP?.let { setTopP(it) }
+            config.loraPath?.let { setLoraPath(it) }
+        }
 
-        val sessionOptions = sessionOptionsBuilder.build()
-        session = LlmInferenceSession.createFromOptions(llmInference, sessionOptions)
-    }
+    val sessionOptions = sessionOptionsBuilder.build()
+    session = LlmInferenceSession.createFromOptions(llmInference, sessionOptions)
+}
 
     fun sizeInTokens(prompt: String): Int = session.sizeInTokens(prompt)
 
@@ -146,6 +151,16 @@ class InferenceModelSession(
 
         if (!bitmap.isRecycled) {
             bitmap.recycle()
+        }
+    }
+
+   fun addAudioToCtx(audioByteArray: ByteArray) {
+    try {
+            // MediaPipe requires mono WAV. Your recorder should already record in WAV/PCM16.
+            session.addAudio(audioByteArray)
+        } catch (e: Exception) {
+            // Optionally log or send errors to errorFlow
+            errorFlow.tryEmit(e)
         }
     }
 

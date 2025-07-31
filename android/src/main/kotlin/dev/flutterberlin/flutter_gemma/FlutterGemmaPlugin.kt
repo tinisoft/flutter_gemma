@@ -142,6 +142,18 @@ private class PlatformServiceImpl(
     }
   }
 
+  override fun addAudioToCtx(audio: ByteArray, callback: (Result<Unit>) -> Unit) {
+    scope.launch {
+        try {
+            session?.addAudioToCtx(audio)
+                ?: throw IllegalStateException("Session not created")
+            callback(Result.success(Unit))
+        } catch (e: Exception) {
+            callback(Result.failure(e))
+        }
+    }
+  }
+
   override fun generateResponse(callback: (Result<String>) -> Unit) {
     scope.launch {
       try {

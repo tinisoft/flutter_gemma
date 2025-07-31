@@ -4,6 +4,13 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+task copyLocalAar(type: Copy) {
+    from '../../../android/libs'
+    into 'libs'
+    include 'tasks_genai.aar'
+}
+preBuild.dependsOn copyLocalAar
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -69,4 +76,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation files('libs/tasks_genai.aar')
+}

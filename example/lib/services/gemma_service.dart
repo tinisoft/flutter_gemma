@@ -25,6 +25,21 @@ class GemmaLocalService {
         yield "Error: Image file not found. ";
       }
     }
+
+    if (message.audioFile != null) {
+      if (await message.audioFile!.exists()) {
+        try {
+          final Uint8List audioBytes = await message.audioFile!.readAsBytes();
+          // Pass with mimeType. Assuming WAV for recording
+          await _chat.addAudioToCtx(audioBytes);
+        } catch (e) {
+          yield "Error: Could not process the audio. ";
+        }
+      } else {
+        yield "Error: Audio file not found. ";
+      }
+    }
+
     await _chat.addQueryChunk(message);
     yield* _chat.generateChatResponseAsync();
   }

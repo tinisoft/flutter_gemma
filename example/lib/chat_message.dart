@@ -1,5 +1,6 @@
 import 'dart:io'; // Required for 'File' type in the Message class
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gemma/flutter_gemma.dart'; // As in the original provided snippet
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -102,6 +103,29 @@ class ChatMessageWidget extends StatelessWidget {
                       ),
                     ),
 
+                  // Display audio message if it exists
+                  if (message.audioFile != null)
+                    Container(
+                      margin: EdgeInsets.only(
+                        bottom: message.text.isNotEmpty ? 8.0 : 0.0,
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.audiotrack, color: Colors.black87),
+                          const SizedBox(width: 8),
+                          TextButton.icon(
+                            icon: const Icon(Icons.play_arrow),
+                            label: const Text("Play Audio"),
+                            onPressed: () async {
+                              final player = AudioPlayer();
+                              await player.play(
+                                  DeviceFileSource(message.audioFile!.path));
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+
                   // Display text if it's not empty
                   if (message.text.isNotEmpty)
                     MarkdownBody(
@@ -115,7 +139,8 @@ class ChatMessageWidget extends StatelessWidget {
                     )
                   // Display loading indicator if there's no text AND no image
                   // (e.g., bot is preparing its response)
-                  else if (message.imageFile == null)
+                  else if (message.imageFile == null &&
+                      message.audioFile == null)
                     const Center(child: CircularProgressIndicator()),
                 ],
               ),

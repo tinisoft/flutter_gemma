@@ -13,7 +13,8 @@ enum PreferredBackend {
 
 @ConfigurePigeon(PigeonOptions(
   dartOut: 'lib/pigeon.g.dart',
-  kotlinOut: 'android/src/main/kotlin/dev/flutterberlin/flutter_gemma/PigeonInterface.g.kt',
+  kotlinOut:
+      'android/src/main/kotlin/dev/flutterberlin/flutter_gemma/PigeonInterface.g.kt',
   kotlinOptions: KotlinOptions(package: 'dev.flutterberlin.flutter_gemma'),
   swiftOut: 'ios/Classes/PigeonInterface.g.swift',
   swiftOptions: SwiftOptions(),
@@ -50,8 +51,11 @@ abstract class PlatformService {
   @async
   void addQueryChunk(String prompt);
 
-  @async 
+  @async
   void addImgToCtx(Uint8List image);
+
+  @async
+  void addAudioToCtx(Uint8List audio);
 
   @async
   String generateResponse();

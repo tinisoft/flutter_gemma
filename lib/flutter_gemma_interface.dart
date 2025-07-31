@@ -107,5 +107,7 @@ abstract class InferenceModelSession {
 
   Future<void> addImgToCtx(Uint8List image);
 
+  Future<void> addAudioToCtx(Uint8List audio);
+
   Future<void> close();
 }

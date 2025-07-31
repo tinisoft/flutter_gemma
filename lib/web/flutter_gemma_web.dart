@@ -151,6 +151,11 @@ class WebModelSession extends InferenceModelSession {
   }
 
   @override
+  Future<void> addAudioToCtx(Uint8List audio) async {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<String> getResponse() async {
     final String fullPrompt = _queryChunks.join(" ");
     final response =

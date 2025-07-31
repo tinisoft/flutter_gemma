@@ -111,7 +111,8 @@ class ChatScreenState extends State<ChatScreen> {
                         _messages.add(Message(
                             text: chatInput.text,
                             isUser: true,
-                            imageFile: chatInput.imageFile));
+                            imageFile: chatInput.imageFile,
+                            audioFile: chatInput.audioFile));
                       });
                     },
                     errorHandler: (err) {

@@ -124,6 +124,7 @@ protocol PlatformService {
   func sizeInTokens(prompt: String, completion: @escaping (Result<Int64, Error>) -> Void)
   func addQueryChunk(prompt: String, completion: @escaping (Result<Void, Error>) -> Void)
   func addImgToCtx(image: FlutterStandardTypedData, completion: @escaping (Result<Void, Error>) -> Void)
+  func addAudioToCtx(audio: FlutterStandardTypedData, completion: @escaping (Result<Void, Error>) -> Void)
   func generateResponse(completion: @escaping (Result<String, Error>) -> Void)
   func generateResponseAsync(completion: @escaping (Result<Void, Error>) -> Void)
 }
@@ -255,6 +256,23 @@ class PlatformServiceSetup {
       }
     } else {
       addImgToCtxChannel.setMessageHandler(nil)
+    }
+    let addAudioToCtxChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_gemma.PlatformService.addAudioToCtx\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      addAudioToCtxChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let audioArg = args[0] as! FlutterStandardTypedData
+        api.addAudioToCtx(audio: audioArg) { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      addAudioToCtxChannel.setMessageHandler(nil)
     }
     let generateResponseChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_gemma.PlatformService.generateResponse\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
