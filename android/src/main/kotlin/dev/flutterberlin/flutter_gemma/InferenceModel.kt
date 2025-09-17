@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.mediapipe.tasks.genai.llminference.LlmInference
 import com.google.mediapipe.tasks.genai.llminference.LlmInferenceSession
 import com.google.mediapipe.tasks.genai.llminference.GraphOptions
+import com.google.mediapipe.tasks.genai.llminference.AudioModelOptions
 import android.graphics.BitmapFactory
 import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.framework.image.MPImage
@@ -68,6 +69,7 @@ class InferenceModel(
                 .setModelPath(config.modelPath)
                 .setMaxTokens(config.maxTokens)
                 .setMaxNumImages(1)
+                .setAudioModelOptions(AudioModelOptions.builder().build())
                 .apply {
                     config.supportedLoraRanks?.let { setSupportedLoraRanks(it) }
                     config.preferredBackend?.let {
@@ -102,20 +104,25 @@ class InferenceModelSession(
 ) {
     private val session: LlmInferenceSession
 
-    init {
-        val sessionOptionsBuilder = LlmInferenceSession.LlmInferenceSessionOptions.builder()
-            .setTemperature(config.temperature)
-            .setRandomSeed(config.randomSeed)
-            .setTopK(config.topK)
-            .setGraphOptions(GraphOptions.builder().setEnableVisionModality(true).build())
-            .apply {
-                config.topP?.let { setTopP(it) }
-                config.loraPath?.let { setLoraPath(it) }
-            }
+   init {
+    val sessionOptionsBuilder = LlmInferenceSession.LlmInferenceSessionOptions.builder()
+        .setTemperature(config.temperature)
+        .setRandomSeed(config.randomSeed)
+        .setTopK(config.topK)
+        .setGraphOptions(
+            GraphOptions.builder()
+                .setEnableVisionModality(true)
+                .setEnableAudioModality(true)  
+                .build()
+        )
+        .apply {
+            config.topP?.let { setTopP(it) }
+            config.loraPath?.let { setLoraPath(it) }
+        }
 
-        val sessionOptions = sessionOptionsBuilder.build()
-        session = LlmInferenceSession.createFromOptions(llmInference, sessionOptions)
-    }
+    val sessionOptions = sessionOptionsBuilder.build()
+    session = LlmInferenceSession.createFromOptions(llmInference, sessionOptions)
+}
 
     fun sizeInTokens(prompt: String): Int = session.sizeInTokens(prompt)
 
@@ -146,6 +153,14 @@ class InferenceModelSession(
 
         if (!bitmap.isRecycled) {
             bitmap.recycle()
+        }
+    }
+
+   fun addAudioToCtx(audioData: ByteArray) {
+    try {
+            session.addAudio(audioData)
+        } catch (e: Exception) {
+            errorFlow.tryEmit(e)
         }
     }
 

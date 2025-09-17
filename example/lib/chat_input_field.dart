@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'dart:io'; // Required for File
 import 'package:image_picker/image_picker.dart'; // Import image_picker
+import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
 
 // --- Data Model ---
 class ChatMessageInputData {
   final String text;
   final File? imageFile;
+  final File? audioFile;
 
-  ChatMessageInputData({required this.text, this.imageFile});
+  ChatMessageInputData({required this.text, this.imageFile, this.audioFile});
 
-  bool get isEmpty => text.trim().isEmpty && imageFile == null;
+  bool get isEmpty =>
+      text.trim().isEmpty && imageFile == null && audioFile == null;
   bool get isNotEmpty => !isEmpty;
 }
 
@@ -77,6 +81,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildMessageItem(Map<String, dynamic> messageData) {
     final String text = messageData['text'] as String;
     final File? imageFile = messageData['imageFile'] as File?;
+    final File? audioFile = messageData['audioFile'] as File?;
     final bool isUser = messageData['isUser'] as bool;
 
     return Container(
@@ -86,7 +91,6 @@ class _ChatScreenState extends State<ChatScreen> {
             isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           Flexible(
-            // Ensures message bubble doesn't overflow
             child: Card(
               color: isUser ? Colors.blue[100] : Colors.grey[200],
               elevation: 2.0,
@@ -102,14 +106,25 @@ class _ChatScreenState extends State<ChatScreen> {
                         borderRadius: BorderRadius.circular(8.0),
                         child: Image.file(
                           imageFile,
-                          width: 150, // Adjust as needed
-                          height: 150, // Adjust as needed
+                          width: 150,
+                          height: 150,
                           fit: BoxFit.cover,
                         ),
                       ),
-                    if (imageFile != null && text.isNotEmpty)
-                      const SizedBox(
-                          height: 8.0), // Spacer if both image and text
+                    if (audioFile != null)
+                      Row(
+                        children: [
+                          const Icon(Icons.audiotrack, size: 20),
+                          const SizedBox(width: 6),
+                          Text(
+                            "Audio message",
+                            style: const TextStyle(fontSize: 16.0),
+                          ),
+                        ],
+                      ),
+                    if ((imageFile != null || audioFile != null) &&
+                        text.isNotEmpty)
+                      const SizedBox(height: 8.0),
                     if (text.isNotEmpty)
                       Text(
                         text,
@@ -163,12 +178,18 @@ class ChatInputFieldState extends State<ChatInputField> {
   final TextEditingController _textController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   File? _selectedImageFile;
+  File? _recordedAudioFile;
+
+  // For recording
+  final AudioRecorder _audioRecorder = AudioRecorder();
+  bool _isRecording = false;
 
   void _handleSubmit() {
     final text = _textController.text.trim();
     final inputData = ChatMessageInputData(
       text: text,
       imageFile: _selectedImageFile,
+      audioFile: _recordedAudioFile,
     );
 
     if (inputData.isNotEmpty) {
@@ -176,6 +197,7 @@ class ChatInputFieldState extends State<ChatInputField> {
       _textController.clear();
       setState(() {
         _selectedImageFile = null;
+        _recordedAudioFile = null;
       });
     }
   }
@@ -184,9 +206,9 @@ class ChatInputFieldState extends State<ChatInputField> {
     try {
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
-        imageQuality: 80, // Optional: compress image
-        maxWidth: 1024, // Optional: resize image
-        maxHeight: 1024, // Optional: resize image
+        imageQuality: 80,
+        maxWidth: 1024,
+        maxHeight: 1024,
       );
 
       if (pickedFile != null) {
@@ -198,9 +220,7 @@ class ChatInputFieldState extends State<ChatInputField> {
       print("Error picking image: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Error picking image: ${e.toString().split(':').last.trim()}')),
+          SnackBar(content: Text('Error picking image: ${e.toString()}')),
         );
       }
     }
@@ -210,7 +230,6 @@ class ChatInputFieldState extends State<ChatInputField> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext sheetContext) {
-        // Use a different context name
         return SafeArea(
           child: Wrap(
             children: <Widget>[
@@ -218,7 +237,7 @@ class ChatInputFieldState extends State<ChatInputField> {
                 leading: const Icon(Icons.photo_library),
                 title: const Text('Gallery'),
                 onTap: () {
-                  Navigator.of(sheetContext).pop(); // Use sheetContext
+                  Navigator.of(sheetContext).pop();
                   _pickImage(ImageSource.gallery);
                 },
               ),
@@ -226,7 +245,7 @@ class ChatInputFieldState extends State<ChatInputField> {
                 leading: const Icon(Icons.photo_camera),
                 title: const Text('Camera'),
                 onTap: () {
-                  Navigator.of(sheetContext).pop(); // Use sheetContext
+                  Navigator.of(sheetContext).pop();
                   _pickImage(ImageSource.camera);
                 },
               ),
@@ -237,9 +256,52 @@ class ChatInputFieldState extends State<ChatInputField> {
     );
   }
 
+  Future<void> _toggleRecording() async {
+    try {
+      if (_isRecording) {
+        // Stop recording
+        final path = await _audioRecorder.stop();
+        setState(() {
+          _isRecording = false;
+          if (path != null) {
+            _recordedAudioFile = File(path);
+          }
+        });
+      } else {
+        // Start recording
+        if (await _audioRecorder.hasPermission()) {
+          const encoder = AudioEncoder.wav;
+          final dir = await getTemporaryDirectory();
+          final path =
+              '${dir.path}/audio_${DateTime.now().millisecondsSinceEpoch}.wav';
+
+          const config = RecordConfig(
+            encoder: encoder,
+            numChannels: 1,
+            sampleRate: 16000,
+          );
+
+          await _audioRecorder.start(
+            config,
+            path: path,
+          );
+          setState(() {
+            _isRecording = true;
+          });
+        } else {
+          debugPrint("Microphone permission denied.");
+        }
+      }
+    } catch (e) {
+      debugPrint("Recording error: $e");
+      setState(() => _isRecording = false);
+    }
+  }
+
   @override
   void dispose() {
     _textController.dispose();
+    _audioRecorder.dispose();
     super.dispose();
   }
 
@@ -263,45 +325,62 @@ class ChatInputFieldState extends State<ChatInputField> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Preview for selected image
-            if (_selectedImageFile != null)
+            // Preview for selected image or audio
+            if (_selectedImageFile != null || _recordedAudioFile != null)
               Padding(
-                padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
-                child: Stack(
-                  alignment: Alignment.topRight,
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.file(
-                        _selectedImageFile!,
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
+                    if (_selectedImageFile != null)
+                      Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.file(
+                              _selectedImageFile!,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedImageFile = null;
+                              });
+                            },
+                            child: _buildCloseButton(),
+                          ),
+                        ],
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedImageFile = null;
-                        });
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.all(4.0),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.7),
-                          shape: BoxShape.circle,
-                        ),
-                        padding: const EdgeInsets.all(4.0),
-                        child: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 18,
+                    if (_recordedAudioFile != null)
+                      Expanded(
+                        child: Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(Icons.audiotrack),
+                                SizedBox(width: 8),
+                                Text("Audio recorded"),
+                              ],
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _recordedAudioFile = null;
+                                });
+                              },
+                              child: _buildCloseButton(),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
+
             // Main input row
             Padding(
               padding:
@@ -313,6 +392,12 @@ class ChatInputFieldState extends State<ChatInputField> {
                     onPressed: () => _showImageSourceActionSheet(context),
                     tooltip: "Attach image",
                   ),
+                  IconButton(
+                    icon: Icon(_isRecording ? Icons.stop : Icons.mic),
+                    color: _isRecording ? Colors.red : null,
+                    onPressed: _toggleRecording,
+                    tooltip: _isRecording ? "Stop recording" : "Record audio",
+                  ),
                   Flexible(
                     child: TextField(
                       controller: _textController,
@@ -321,20 +406,18 @@ class ChatInputFieldState extends State<ChatInputField> {
                         hintText: 'Send a message...',
                       ),
                       minLines: 1,
-                      maxLines: 5, // Allow multi-line input
+                      maxLines: 5,
                       textInputAction: TextInputAction.send,
                       onChanged: (text) {
-                        // You can call setState here if you want the send button
-                        // to update its enabled state reactively.
                         setState(() {});
                       },
                     ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.send),
-                    // Disable button if both text and image are empty
                     onPressed: (_textController.text.trim().isNotEmpty ||
-                            _selectedImageFile != null)
+                            _selectedImageFile != null ||
+                            _recordedAudioFile != null)
                         ? _handleSubmit
                         : null,
                     tooltip: "Send",
@@ -344,6 +427,22 @@ class ChatInputFieldState extends State<ChatInputField> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildCloseButton() {
+    return Container(
+      margin: const EdgeInsets.all(4.0),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.7),
+        shape: BoxShape.circle,
+      ),
+      padding: const EdgeInsets.all(4.0),
+      child: const Icon(
+        Icons.close,
+        color: Colors.white,
+        size: 18,
       ),
     );
   }

@@ -29,7 +29,7 @@ android {
 
 
     aaptOptions {
-        noCompress "tflite", "safetensors", "bin", "model", "task"
+        noCompress "tflite", "safetensors", "bin", "model", "task", "lite"
     }
 
     compileOptions {
@@ -68,5 +68,3 @@ android {
 flutter {
     source '../..'
 }
-
-dependencies {}

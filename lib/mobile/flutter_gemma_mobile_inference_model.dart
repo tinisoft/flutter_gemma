@@ -119,6 +119,11 @@ class MobileInferenceModelSession extends InferenceModelSession {
   }
 
   @override
+  Future<void> addAudioToCtx(Uint8List audio) async {
+    await _platformService.addAudioToCtx(audio);
+  }
+
+  @override
   Future<String> getResponse({Message? message}) async {
     _assertNotClosed();
     await _awaitLastResponse();
