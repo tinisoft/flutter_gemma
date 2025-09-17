@@ -332,29 +332,27 @@ class ChatInputFieldState extends State<ChatInputField> {
                 child: Row(
                   children: [
                     if (_selectedImageFile != null)
-                      Expanded(
-                        child: Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.file(
-                                _selectedImageFile!,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
+                      Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.file(
+                              _selectedImageFile!,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _selectedImageFile = null;
-                                });
-                              },
-                              child: _buildCloseButton(),
-                            ),
-                          ],
-                        ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedImageFile = null;
+                              });
+                            },
+                            child: _buildCloseButton(),
+                          ),
+                        ],
                       ),
                     if (_recordedAudioFile != null)
                       Expanded(
