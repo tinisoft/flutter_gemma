@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.mediapipe.tasks.genai.llminference.LlmInference
 import com.google.mediapipe.tasks.genai.llminference.LlmInferenceSession
 import com.google.mediapipe.tasks.genai.llminference.GraphOptions
+import com.google.mediapipe.tasks.genai.llminference.AudioModelOptions
 import android.graphics.BitmapFactory
 import com.google.mediapipe.framework.image.BitmapImageBuilder
 import com.google.mediapipe.framework.image.MPImage
@@ -68,6 +69,7 @@ class InferenceModel(
                 .setModelPath(config.modelPath)
                 .setMaxTokens(config.maxTokens)
                 .setMaxNumImages(1)
+                .setAudioModelOptions(AudioModelOptions.builder().build())
                 .apply {
                     config.supportedLoraRanks?.let { setSupportedLoraRanks(it) }
                     config.preferredBackend?.let {
@@ -154,9 +156,9 @@ class InferenceModelSession(
         }
     }
 
-   fun addAudioToCtx(audioByteArray: ByteArray) {
+   fun addAudioToCtx(audioData: ByteArray) {
     try {
-            session.addAudio(audioByteArray)
+            session.addAudio(audioData)
         } catch (e: Exception) {
             errorFlow.tryEmit(e)
         }

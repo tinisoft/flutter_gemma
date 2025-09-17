@@ -4,13 +4,6 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
-task copyLocalAar(type: Copy) {
-    from '../../../android/libs'
-    into 'libs'
-    include 'tasks_genai.aar'
-}
-preBuild.dependsOn copyLocalAar
-
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -36,7 +29,7 @@ android {
 
 
     aaptOptions {
-        noCompress "tflite", "safetensors", "bin", "model", "task"
+        noCompress "tflite", "safetensors", "bin", "model", "task", "lite"
     }
 
     compileOptions {
@@ -74,8 +67,4 @@ android {
 
 flutter {
     source '../..'
-}
-
-dependencies {
-    implementation files('libs/tasks_genai.aar')
 }

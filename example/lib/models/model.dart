@@ -18,9 +18,9 @@ enum Model {
   ),
   gemma3Gpu(
     url:
-        'https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.task',
-    filename: 'gemma3-1b-it-int4.task',
-    displayName: 'Gemma3 1B IT (GPU / Remote)',
+        'https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.litertlm',
+    filename: 'gemma3-1b-it-int4.litertlm',
+    displayName: 'Gemma3 1B IT (GPU / Remote) Litertlm',
     licenseUrl: 'https://huggingface.co/litert-community/Gemma3-1B-IT',
     needsAuth: true,
     preferredBackend: PreferredBackend.gpu,
@@ -31,9 +31,9 @@ enum Model {
   ),
   gemma3Cpu(
     url:
-        'https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.task',
-    filename: 'gemma3-1b-it-int4.task',
-    displayName: 'Gemma3 1B IT (CPU / Remote)',
+        'https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.litertlm',
+    filename: 'gemma3-1b-it-int4.litertlm',
+    displayName: 'Gemma3 1B IT (CPU / Remote) Litertlm',
     licenseUrl: 'https://huggingface.co/litert-community/Gemma3-1B-IT',
     needsAuth: true,
     preferredBackend: PreferredBackend.cpu,
@@ -61,9 +61,9 @@ enum Model {
   // New Gemma 3n E4B models
   gemma3nE4BGpu(
     url:
-        'https://huggingface.co/google/gemma-3n-E4B-it-litert-preview/resolve/main/gemma-3n-E4B-it-int4.task',
-    filename: 'gemma-3n-E4B-it-int4.task',
-    displayName: 'Gemma 3n E4B IT (GPU / Remote)',
+        'https://huggingface.co/google/gemma-3n-E4B-it-litert-lm/resolve/main/gemma-3n-E4B-it-int4.litertlm',
+    filename: 'gemma-3n-E4B-it-int4.litertlm',
+    displayName: 'Gemma 3n E4B IT (GPU / Remote) Litertlm',
     licenseUrl: 'https://huggingface.co/google/gemma-3n-E4B-it-litert-preview',
     needsAuth: true,
     preferredBackend: PreferredBackend.gpu,
@@ -74,9 +74,9 @@ enum Model {
   ),
   gemma3nE4BCpu(
     url:
-        'https://huggingface.co/google/gemma-3n-E4B-it-litert-preview/resolve/main/gemma-3n-E4B-it-int4.task',
-    filename: 'gemma-3n-E4B-it-int4.task',
-    displayName: 'Gemma 3n E4B IT (CPU / Remote)',
+        'https://huggingface.co/google/gemma-3n-E4B-it-litert-lm/resolve/main/gemma-3n-E4B-it-int4.litertlm',
+    filename: 'gemma-3n-E4B-it-int4.litertlm',
+    displayName: 'Gemma 3n E4B IT (CPU / Remote) Litertlm',
     licenseUrl: 'https://huggingface.co/google/gemma-3n-E4B-it-litert-preview',
     needsAuth: true,
     preferredBackend: PreferredBackend.cpu,
@@ -89,9 +89,9 @@ enum Model {
   // New Gemma 3n E2B models
   gemma3nE2BGpu(
     url:
-        'https://huggingface.co/google/gemma-3n-E2B-it-litert-preview/resolve/main/gemma-3n-E2B-it-int4.task',
-    filename: 'gemma-3n-E2B-it-int4.task',
-    displayName: 'Gemma 3n E2B IT (GPU / Remote)',
+        'https://huggingface.co/google/gemma-3n-E2B-it-litert-lm/resolve/main/gemma-3n-E2B-it-int4.litertlm',
+    filename: 'gemma-3n-E2B-it-int4.litertlm',
+    displayName: 'Gemma 3n E2B IT (GPU / Remote) Litertlm',
     licenseUrl: 'https://huggingface.co/google/gemma-3n-E2B-it-litert-preview',
     needsAuth: true,
     preferredBackend: PreferredBackend.gpu,
@@ -102,9 +102,9 @@ enum Model {
   ),
   gemma3nE2BCpu(
     url:
-        'https://huggingface.co/google/gemma-3n-E2B-it-litert-preview/resolve/main/gemma-3n-E2B-it-int4.task',
-    filename: 'gemma-3n-E2B-it-int4.task',
-    displayName: 'Gemma 3n E2B IT (CPU / Remote)',
+        'https://huggingface.co/google/gemma-3n-E2B-it-litert-lm/resolve/main/gemma-3n-E2B-it-int4.litertlm',
+    filename: 'gemma-3n-E2B-it-int4.litertlm',
+    displayName: 'Gemma 3n E2B IT (CPU / Remote) Litertlm',
     licenseUrl: 'https://huggingface.co/google/gemma-3n-E2B-it-litert-preview',
     needsAuth: true,
     preferredBackend: PreferredBackend.cpu,
